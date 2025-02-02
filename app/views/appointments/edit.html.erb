@@ -1,0 +1,17 @@
+<h1>Editar Agendamento</h1>
+
+<%= form_with(model: @appointment, local: true) do |form| %>
+  <div class="field">
+    <%= form.label :date, "Data" %>
+    <%= form.datetime_select :date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :user_id, "Profissional" %>
+    <%= form.collection_select :user_id, @professionals, :id, :name %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Atualizar Agendamento", class: "btn btn-primary" %>
+  </div>
+<% end %>

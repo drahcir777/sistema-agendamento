@@ -1,0 +1,29 @@
+<!-- app/views/users/appointments.html.erb -->
+<h1>Agendamentos de <%= @user.name %></h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Cliente</th>
+      <th>Telefone</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+
+  <%= link_to 'Voltar', admin_path, class: 'btn-secundary' if current_user.admin? %>
+  <%= link_to 'Agendar Cliente', new_user_appointment_path(@user), class: 'btn btn-primary' %><br />
+
+  <tbody id="appointments">
+  <% @appointments.each do |appointment| %>
+    <tr id="<%= dom_id(appointment) %>">
+      <td><%= appointment.date %></td>
+      <td><%= appointment.client.name %></td>
+      <td><%= appointment.client.phone %></td>
+      <td class="btn-group gap-2">
+        <%= link_to 'Editar', edit_appointment_path(appointment), class: 'btn btn-warning btn-sm' %>
+        <%= button_to 'Excluir', appointment_path(appointment), method: :delete, data: { turbo_confirm: "Você tem certeza?" }, class: 'btn btn-danger btn-sm', form: { data: { turbo_stream: true } } %>
+      </td>
+    </tr>
+  <% end %>
+</tbody>

@@ -1,0 +1,29 @@
+<h1>Agendar Horário</h1>
+
+<%= form_with(model: [@professional, @appointment], local: true) do |form| %>
+  <div class="field">
+    <%= form.label :date %>
+    <%= form.datetime_select :date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :professional %>
+    <%= form.collection_select :user_id, @professionals, :id, :name, { selected: @professional.id } %>
+  </div>
+
+  <h2>Dados do Cliente</h2>
+
+  <div class="field">
+    <%= form.label :client_name, "Nome do Cliente" %>
+    <%= form.text_field :client_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :client_phone, "Telefone do Cliente" %>
+    <%= form.text_field :client_phone %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Agendar" %>
+  </div>
+<% end %>
