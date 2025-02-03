@@ -18,12 +18,15 @@ class AppointmentsController < ApplicationController
   def new
     @appointment = Appointment.new
     @professionals = User.where(admin: false)
+    @services = Service.all
   end
 
   def create
     @professional = User.find(appointment_params[:user_id])
+    @service = Service.find(appointment_params[:service_id])
     @appointment = @professional.appointments_as_professional.new(appointment_params)
     @appointment.client = find_or_create_client
+    @appointment.end_time = @appointment.date + @service.duration.minutes
 
     if @appointment.save
       respond_to do |format|
@@ -106,8 +109,10 @@ class AppointmentsController < ApplicationController
     @appointment = Appointment.find(params[:id])
   end
 
+  private
+
   def appointment_params
-    params.require(:appointment).permit(:date, :user_id, :client_name, :client_phone)
+    params.require(:appointment).permit(:date, :user_id, :service_id, :client_name, :client_phone)
   end
 
   def find_or_create_client

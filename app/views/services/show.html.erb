@@ -1,0 +1,19 @@
+<h1>Detalhes do Serviço</h1>
+
+<p>
+  <strong>Nome:</strong>
+  <%= @service.name %>
+</p>
+
+<p>
+  <strong>Descrição:</strong>
+  <%= @service.description %>
+</p>
+
+<p>
+  <strong>Duração:</strong>
+  <%= @service.formatted_duration %> minutos
+</p>
+
+<%= link_to 'Editar', edit_service_path(@service), class: 'btn btn-warning' %>
+<%= link_to 'Voltar', services_path, class: 'btn btn-secondary' %>

@@ -1,0 +1,26 @@
+<h1>Serviços</h1>
+<%= link_to 'Voltar', admin_path, class: 'btn btn-segundary' %>
+<%= link_to 'Novo Serviço', new_service_path, class: 'btn btn-primary' %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Descrição</th>
+      <th>Duração</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @services.each do |service| %>
+      <tr>
+        <td><%= service.name %></td>
+        <td><%= service.description %></td>
+        <td><%= service.formatted_duration %> minutos</td>
+        <td>
+          <%= link_to 'Editar', edit_service_path(service), class: 'btn btn-warning' %>
+          <%= button_to 'Excluir', service_path(service), method: :delete, data: { turbo_confirm: "Você tem certeza?" }, class: 'btn btn-danger btn-sm' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

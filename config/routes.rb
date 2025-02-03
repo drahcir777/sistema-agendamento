@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   get "users/:id/appointments", to: "users#appointments", as: "user_appointments"
 
+  resources :services
   resources :users do
     resources :appointments, only: [ :new, :create ], controller: "appointments"
   end

@@ -1,6 +1,16 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [ :edit, :update, :destroy, :appointments ]
 
+
+  def create
+    @user = User.new(user_params)
+    if @user.save
+      create_appointments_for_services(@user)
+      redirect_to admin_path, notice: "Profissional criado com sucesso."
+    else
+      render :new
+    end
+  end
   def edit
   end
 
@@ -19,6 +29,15 @@ class UsersController < ApplicationController
 
   def appointments
     @appointments = @user.appointments_as_professional
+  end
+
+  private
+
+  def create_appointments_for_services(user)
+    user.services.each do |service|
+      # Lógica para criar horários disponíveis na agenda do profissional
+      # com base na duração do serviço
+    end
   end
 
   private

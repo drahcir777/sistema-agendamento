@@ -11,6 +11,11 @@
     <%= form.collection_select :user_id, @professionals, :id, :name, { selected: @professional.id } %>
   </div>
 
+  <div class="field">
+    <%= form.label :service_id, "Serviço" %>
+    <%= form.collection_select :service_id, @services, :id, :name %>
+  </div>
+
   <h2>Dados do Cliente</h2>
 
   <div class="field">
