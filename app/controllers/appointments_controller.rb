@@ -1,5 +1,5 @@
 class AppointmentsController < ApplicationController
-  before_action :authenticate_user!, except: [ :index, :new, :create, :show, :edit, :update, :destroy, :by_phone ]
+  before_action :authenticate_user!, except: [ :index, :new, :create, :show, :edit, :update, :destroy, :by_phone, :available_dates_and_times ]
   before_action :set_appointment, only: [ :show, :edit, :update, :destroy ]
   before_action :set_professional, only: [ :new, :create ]
 
@@ -17,8 +17,21 @@ class AppointmentsController < ApplicationController
 
   def new
     @appointment = Appointment.new
-    @professionals = User.where(admin: false)
+    @professionals = User.professionals
     @services = Service.all
+
+    # Carrega as datas disponíveis tanto para admin quanto para cliente não logado
+    if params[:user_id]
+      @professional = User.find(params[:user_id])
+    else
+      @professional = User.professionals.first
+    end
+
+    # Carrega as datas disponíveis iniciais
+    @available_dates = @professional.disponibilidades
+                                  .pluck(:data)
+                                  .uniq
+                                  .sort if @professional
   end
 
   def create
@@ -89,10 +102,30 @@ class AppointmentsController < ApplicationController
     render :index
   end
 
-  private
-
-  def find_professional
+  def available_dates_and_times
     @professional = User.find(params[:user_id])
+    @date = params[:date]
+
+    @available_dates = @professional.disponibilidades
+                                 .pluck(:data)
+                                 .uniq
+                                 .sort
+
+    @available_times = if @date.present?
+      @professional.disponibilidades
+                  .where(data: @date)
+                  .pluck(:horario)
+                  .uniq
+                  .sort
+                  .map { |time| time.strftime("%H:%M") }
+    else
+      []
+    end
+
+    render json: {
+      dates: @available_dates,
+      times: @available_times
+    }
   end
 
   private
@@ -108,8 +141,6 @@ class AppointmentsController < ApplicationController
   def set_appointment
     @appointment = Appointment.find(params[:id])
   end
-
-  private
 
   def appointment_params
     params.require(:appointment).permit(:date, :user_id, :service_id, :client_name, :client_phone)

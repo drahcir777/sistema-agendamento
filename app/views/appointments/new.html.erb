@@ -1,14 +1,36 @@
 <h1>Agendar Horário</h1>
 
-<%= form_with(model: [@professional, @appointment], local: true) do |form| %>
+<%= form_with(model: [@professional, @appointment], local: true, data: { controller: "appointments" }) do |form| %>
   <div class="field">
-    <%= form.label :date %>
-    <%= form.datetime_select :date %>
+    <%= form.label :professional %>
+    <%= form.collection_select :user_id, 
+                         @professionals, 
+                         :id, 
+                         :name, 
+                         { selected: @professional&.id }, 
+                         { data: { 
+                           target: "appointments.professionalSelect",
+                           action: "change->appointments#professionalChanged"
+                         }} %>
   </div>
 
   <div class="field">
-    <%= form.label :professional %>
-    <%= form.collection_select :user_id, @professionals, :id, :name, { selected: @professional.id } %>
+    <%= form.label :date, "Data Disponível" %>
+    <%= form.select :date, 
+                   [], 
+                   { prompt: "Selecione uma data" }, 
+                   { data: { 
+                    target: "appointments.dateSelect",
+                    action: "change->appointments#dateChanged"
+                   }} %>
+  </div>
+
+  <div class="field">
+    <%= form.label :time, "Horário Disponível" %>
+    <%= form.select :time, 
+                   [], 
+                   { prompt: "Selecione um horário" }, 
+                   { data: { target: "appointments.timeSelect" }} %>
   </div>
 
   <div class="field">

@@ -1,0 +1,36 @@
+<%= form_with(model: [@professional, @disponibilidade ], local: true) do |form| %>
+  <% if @disponibilidade.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@disponibilidade.errors.count, "error") %> prohibited this disponibilidade from being saved:</h2>
+
+      <ul>
+        <% @disponibilidade.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :professional, "Profissional" %>
+    <%= form.collection_select :user_id, @professionals, :id, :name, prompt: "Selecione um profissional" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :data %>
+    <%= form.text_field :data, class: "input input--datepicker", data: { 
+                         controller: "datepicker",
+                         datepicker_date_format_value: "Y-m-d"
+                       },
+                       placeholder: "Selecione uma data" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :horario %>
+    <%= form.time_select :horario %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,31 @@
+<h1>Disponibilidades</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Profissional</th>
+      <th>Data</th>
+      <th>Horário</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @disponibilidades.each do |disponibilidade| %>
+      <tr>
+        <td><%= disponibilidade.profissional.name %></td>
+        <td><%= disponibilidade.data %></td>
+        <td><%= disponibilidade.horario.strftime("%H:%M") %></td>
+        <td>
+          <%= link_to 'Show', disponibilidade %>
+          <%= link_to 'Edit', edit_disponibilidade_path(disponibilidade) %>
+          <%= link_to 'Destroy', disponibilidade, method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Disponibilidade', new_disponibilidade_path %>

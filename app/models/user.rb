@@ -8,9 +8,12 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true, uniqueness: true
 
+  scope :professionals, -> { where(admin: false) }
+
   has_many :appointments_as_professional, class_name: "Appointment", foreign_key: "user_id"
   has_many :appointments_as_client, class_name: "Appointment", foreign_key: "client_id"
   has_many :services
+  has_many :disponibilidades
 
   before_save :format_phone_number
 

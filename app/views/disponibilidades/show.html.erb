@@ -1,0 +1,17 @@
+<p>
+  <strong>Profissional:</strong>
+  <%= @disponibilidade.profissional.name %>
+</p>
+
+<p>
+  <strong>Data:</strong>
+  <%= @disponibilidade.data %>
+</p>
+
+<p>
+  <strong>Horário:</strong>
+  <%= @disponibilidade.horario.strftime("%H:%M") %>
+</p>
+
+<%= link_to 'Edit', edit_disponibilidade_path(@disponibilidade) %> |
+<%= link_to 'Back', disponibilidades_path %>
