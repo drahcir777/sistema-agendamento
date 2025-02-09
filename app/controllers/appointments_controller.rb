@@ -18,7 +18,6 @@ class AppointmentsController < ApplicationController
   def new
     @appointment = Appointment.new
     @professionals = User.professionals
-    @services = Service.all
 
     # Carrega as datas disponíveis tanto para admin quanto para cliente não logado
     if params[:user_id]
@@ -36,10 +35,24 @@ class AppointmentsController < ApplicationController
 
   def create
     @professional = User.find(appointment_params[:user_id])
-    @service = Service.find(appointment_params[:service_id])
-    @appointment = @professional.appointments_as_professional.new(appointment_params)
+    datetime_params = appointment_params.to_h
+
+    if datetime_params[:date].present? && datetime_params[:time].present?
+      date = Date.parse(datetime_params[:date])
+      time = Time.parse(datetime_params[:time])
+
+      # Cria o datetime usando Time.zone para respeitar o timezone
+      datetime_params[:date] = Time.zone.local(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.min
+      )
+    end
+
+    @appointment = @professional.appointments_as_professional.new(datetime_params)
     @appointment.client = find_or_create_client
-    @appointment.end_time = @appointment.date + @service.duration.minutes
 
     if @appointment.save
       respond_to do |format|
@@ -55,7 +68,8 @@ class AppointmentsController < ApplicationController
         end
       end
     else
-      render :new
+      @professionals = User.professionals
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -106,18 +120,29 @@ class AppointmentsController < ApplicationController
     @professional = User.find(params[:user_id])
     @date = params[:date]
 
+    # Obtém todas as datas disponíveis
     @available_dates = @professional.disponibilidades
-                                 .pluck(:data)
-                                 .uniq
-                                 .sort
+                                  .pluck(:data)
+                                  .uniq
+                                  .sort
 
     @available_times = if @date.present?
-      @professional.disponibilidades
-                  .where(data: @date)
-                  .pluck(:horario)
-                  .uniq
-                  .sort
-                  .map { |time| time.strftime("%H:%M") }
+      # Obtém todos os horários disponíveis para a data selecionada
+      available_times = @professional.disponibilidades
+                                   .where(data: @date)
+                                   .pluck(:horario)
+                                   .map { |t| t.strftime("%H:%M") }
+                                   .uniq
+                                   .sort
+
+      # Obtém os horários já agendados para a data
+      booked_times = @professional.appointments_as_professional
+                                 .where("DATE(date) = ?", @date)
+                                 .pluck(:date)
+                                 .map { |dt| dt.strftime("%H:%M") }
+
+      # Remove os horários já agendados da lista de disponíveis
+      available_times - booked_times
     else
       []
     end
@@ -143,7 +168,7 @@ class AppointmentsController < ApplicationController
   end
 
   def appointment_params
-    params.require(:appointment).permit(:date, :user_id, :service_id, :client_name, :client_phone)
+    params.require(:appointment).permit(:date, :time, :user_id, :client_name, :client_phone)
   end
 
   def find_or_create_client

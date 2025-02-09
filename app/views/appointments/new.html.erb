@@ -1,6 +1,16 @@
 <h1>Agendar Horário</h1>
 
 <%= form_with(model: [@professional, @appointment], local: true, data: { controller: "appointments" }) do |form| %>
+  <% if @appointment.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@appointment.errors.count, "erro") %> impediram este agendamento de ser salvo:</h2>
+        <ul>
+          <% @appointment.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <div class="field">
     <%= form.label :professional %>
     <%= form.collection_select :user_id, 
@@ -31,11 +41,6 @@
                    [], 
                    { prompt: "Selecione um horário" }, 
                    { data: { target: "appointments.timeSelect" }} %>
-  </div>
-
-  <div class="field">
-    <%= form.label :service_id, "Serviço" %>
-    <%= form.collection_select :service_id, @services, :id, :name %>
   </div>
 
   <h2>Dados do Cliente</h2>
