@@ -53,24 +53,51 @@ class AppointmentsController < ApplicationController
 
     @appointment = @professional.appointments_as_professional.new(datetime_params)
     @appointment.client = find_or_create_client
+    @appointment.status = "pending"
 
-    if @appointment.save
-      respond_to do |format|
-        if user_signed_in?
-          if current_user.admin?
-            format.html { redirect_to user_appointments_path(@professional), notice: "Agendamento criado com sucesso." }
-          else
-            format.html { redirect_to user_appointments_path(current_user), notice: "Agendamento criado com sucesso." }
-            format.turbo_stream { redirect_to user_appointments_path(current_user), notice: "Agendamento criado com sucesso." }
-          end
-        else
-          format.html { redirect_to appointments_path, notice: "Agendamento criado com sucesso." }
+    if @appointment.valid?
+      if @appointment.save
+        # Gera a URL de confirmação após ter o ID do agendamento
+        confirmation_url = confirm_appointment_url(@appointment)
+
+        message = [
+          "Olá #{@professional.name},",
+          "#{@appointment.client.name} deseja agendar um horário para #{datetime_params[:date].strftime('%d/%m/%Y às %H:%M')}.",
+          "",
+          "Para confirmar, acesse o link abaixo:"
+        ].join("\n")
+
+        # Envia mensagem para o profissional com o link de confirmação
+        WhatsappNotificationService.send_message(
+          to: @professional.phone,
+          message: message,
+          confirmation_url: confirmation_url
+        )
+
+        respond_to do |format|
+          format.html { redirect_to appointments_path, notice: "Solicitação de agendamento enviada para o profissional." }
         end
+      else
+        @professionals = User.professionals
+        render :new, status: :unprocessable_entity
       end
     else
       @professionals = User.professionals
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def confirm
+    @appointment = Appointment.find(params[:id])
+    @appointment.update(status: "confirmed")
+
+    # Notifica o cliente que o agendamento foi confirmado
+    WhatsappNotificationService.send_message(
+      to: @appointment.client.phone,
+      message: "Olá #{@appointment.client.name}, seu agendamento com #{@appointment.user.name} para #{@appointment.date.strftime('%d/%m/%Y às %H:%M')} foi confirmado!"
+    )
+
+    redirect_to appointment_path(@appointment), notice: "Agendamento confirmado com sucesso!"
   end
 
   def show

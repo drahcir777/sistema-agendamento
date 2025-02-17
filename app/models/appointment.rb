@@ -9,6 +9,7 @@ class Appointment < ApplicationRecord
   validates :client_phone, presence: { message: "Telefone do cliente é obrigatório" }
   validate :time_slot_available
   validate :date_and_time_must_be_present
+  validates :status, presence: true, inclusion: { in: %w[pending confirmed rejected] }
 
   attr_accessor :time
   attr_accessor :client_name, :client_phone
@@ -32,5 +33,13 @@ class Appointment < ApplicationRecord
     if existing_appointment
       errors.add(:date, "Este horário já está agendado")
     end
+  end
+
+  def confirm!
+    update(status: "confirmed")
+  end
+
+  def reject!
+    update(status: "rejected")
   end
 end

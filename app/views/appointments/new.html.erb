@@ -19,15 +19,15 @@
                          :name, 
                          { selected: @professional&.id }, 
                          { data: { 
-                           target: "appointments.professionalSelect",
-                           action: "change->appointments#professionalChanged"
-                         }} %>
+                                 appointments_target: "professionalSelect",
+                                 action: "change->appointments#professionalChanged"
+                               }} %>
   </div>
 
   <div class="field">
     <%= form.label :date, "Data Disponível" %>
     <%= form.select :date, 
-                   [], 
+                    [],
                    { prompt: "Selecione uma data" }, 
                    { data: { 
                     target: "appointments.dateSelect",
@@ -40,7 +40,7 @@
     <%= form.select :time, 
                    [], 
                    { prompt: "Selecione um horário" }, 
-                   { data: { target: "appointments.timeSelect" }} %>
+                   { data: { appointments_target: "timeSelect" } } %>
   </div>
 
   <h2>Dados do Cliente</h2>

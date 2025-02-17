@@ -12,6 +12,9 @@ Rails.application.routes.draw do
     collection do
       get "available_dates_and_times"
     end
+    member do
+      get :confirm
+    end
   end
 
   resources :users do

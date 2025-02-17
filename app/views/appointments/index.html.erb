@@ -24,12 +24,15 @@
 
   <tbody>
     <% @appointments.each do |appointment| %>
-      <tr>
-        <td><%= appointment.date %></td>
-        <td><%= appointment.professional.name %></td>
-        <td><%= appointment.client.name %></td>
-        <td><%= link_to 'Ver', appointment_path(appointment) %></td>
-      </tr>
-    <% end %>
+  <div class="appointment">
+    <!-- campos existentes -->
+    <div class="status">
+      Status: <%= appointment.status %>
+      <% if appointment.status == 'pending' && current_user == appointment.professional %>
+        <%= button_to "Confirmar", confirm_appointment_path(appointment), method: :post, class: "confirm-btn" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
   </tbody>
 </table>
