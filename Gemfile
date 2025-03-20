@@ -60,4 +60,4 @@ group :development do
   gem "web-console"
 end
 
-gem "css-zero", "~> 1.0"
+gem "css-zero", "~> 1.1"
